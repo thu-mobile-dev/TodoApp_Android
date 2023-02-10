@@ -12,15 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
-    private final TodoList todoList;
+    private List<Todo> todoList;
     private final LayoutInflater inflater;
+    private TodoRepository repository;
 
-    public TodoListAdapter(Context context, TodoList todoList) {
+    public TodoListAdapter(Context context, List<Todo> todoList, TodoRepository repository) {
         inflater = LayoutInflater.from(context);
         this.todoList = todoList;
+        this.repository = repository;
     }
 
     @NonNull
@@ -29,7 +32,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         // Inflate an item view.
         View mItemView = inflater.inflate(
                 R.layout.todolist_item, parent, false);
-        return new TodoViewHolder(mItemView, this);
+        return new TodoViewHolder(mItemView, this, repository);
     }
 
     @Override
@@ -45,8 +48,13 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         return todoList.size();
     }
 
-    public TodoList getTodoList() {
+    public List<Todo> getTodoList() {
         return todoList;
+    }
+
+    public void setTodoList(List<Todo> todoList) {
+        this.todoList = todoList;
+        notifyDataSetChanged();
     }
 }
 
@@ -54,7 +62,7 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
     public final TextView todoItemView;
     private final TodoListAdapter adapter;
 
-    public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter) {
+    public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter, TodoRepository repository) {
         super(itemView);
         todoItemView = itemView.findViewById(R.id.todo);
         this.adapter = adapter;
@@ -72,7 +80,9 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
 //                        String element = adapter.getTodoList().get(position).getContent();
 //                        // Change the word in the mWordList.
 
-                        adapter.getTodoList().delete(position);
+                        Todo todo = adapter.getTodoList().get(position);
+                        repository.delete(todo.getNumber());
+                        adapter.getTodoList().remove(position);
                         // Notify the adapter, that the data has changed so it can
                         // update the RecyclerView to display the data.
                         adapter.notifyDataSetChanged();

@@ -1,6 +1,11 @@
 package org.tsinghua.todoapp;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "todo_table")
 public class Todo {
+    @PrimaryKey
     private int number = 0;
     private String content = "";
 
