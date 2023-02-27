@@ -8,21 +8,21 @@
     <TextView
         android:id="@+id/todo"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="0dp"
+        android:layout_height="wrap_content"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/todo_button"
+        app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RadioButton
-        android:id="@+id/todo_button"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginStart="10dp"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="#00FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="?android:attr/listChoiceIndicatorSingle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
