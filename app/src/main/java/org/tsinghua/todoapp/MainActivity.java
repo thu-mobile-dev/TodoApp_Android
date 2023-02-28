@@ -35,11 +35,6 @@ public class MainActivity extends AppCompatActivity {
         addButton = findViewById(R.id.add_button);
         textInputLayout = findViewById(R.id.textInputLayout);
 
-
-//        // Put initial data into the word list.
-//        for (int i = 0; i < 20; i++) {
-//            todoList.insert("Todo " + i);
-//        }
         // TODO: 2023/2/10 .get() will block the UI thread
         try {
             repository = new asyncCreateRepository().execute(this.getApplication()).get();

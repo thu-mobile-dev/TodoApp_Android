@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -68,18 +69,12 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
         this.adapter = adapter;
         for(int index = 0; index < ((ViewGroup) itemView).getChildCount(); index++) {
             View nextChild = ((ViewGroup) itemView).getChildAt(index);
-            if (nextChild instanceof Button) {
+            if (nextChild instanceof ImageButton) {
                 nextChild.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((RadioButton) view).setChecked(false);
                         // Get the position of the item that was clicked.
                         int position = getLayoutPosition();
-
-//                        // Use that to access the affected item in mWordList.
-//                        String element = adapter.getTodoList().get(position).getContent();
-//                        // Change the word in the mWordList.
-
                         Todo todo = adapter.getTodoList().get(position);
                         repository.delete(todo.getNumber());
                         adapter.getTodoList().remove(position);
