@@ -56,21 +56,14 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
     public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter) {
         super(itemView);
         todoItemView = itemView.findViewById(R.id.todo);
-        for(int index = 0; index < ((ViewGroup) itemView).getChildCount(); index++) {
-            View nextChild = ((ViewGroup) itemView).getChildAt(index);
-            if (nextChild instanceof ImageButton) {
-                nextChild.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Get the position of the item that was clicked.
-                        int position = getLayoutPosition();
-                        adapter.getTodoList().delete(position);
-                        // Notify the adapter, that the data has changed so it can
-                        // update the RecyclerView to display the data.
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }
+        ImageButton imageButton = itemView.findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(view -> {
+            // Get the position of the item that was clicked.
+            int position = getLayoutPosition();
+            adapter.getTodoList().delete(position);
+            // Notify the adapter, that the data has changed so it can
+            // update the RecyclerView to display the data.
+            adapter.notifyDataSetChanged();
+        });
     }
 }
