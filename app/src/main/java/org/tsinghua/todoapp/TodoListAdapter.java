@@ -10,6 +10,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
@@ -17,14 +19,12 @@ import java.util.List;
 
 public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
-    private List<Todo> todoList;
     private final LayoutInflater inflater;
-    private TodoRepository repository;
+    private TodoViewModel todoViewModel;
 
-    public TodoListAdapter(Context context, List<Todo> todoList, TodoRepository repository) {
+    public TodoListAdapter(Context context, TodoViewModel viewModel) {
         inflater = LayoutInflater.from(context);
-        this.todoList = todoList;
-        this.repository = repository;
+        this.todoViewModel = viewModel;
     }
 
     @NonNull
@@ -33,40 +33,35 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         // Inflate an item view.
         View mItemView = inflater.inflate(
                 R.layout.todolist_item, parent, false);
-        return new TodoViewHolder(mItemView, this, repository);
+        return new TodoViewHolder(mItemView, this, todoViewModel);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TodoViewHolder holder, int position) {
         // Retrieve the data for that position.
-        String current = todoList.get(position).getContent();
+        String current = todoViewModel.getAllTodos().getValue().get(position).getContent();
         // Add the data to the view holder.
         holder.todoItemView.setText(current);
     }
 
     @Override
     public int getItemCount() {
-        return todoList.size();
+        return todoViewModel.getAllTodos().getValue().size();
     }
 
     public List<Todo> getTodoList() {
-        return todoList;
+        return todoViewModel.getAllTodos().getValue();
     }
 
-    public void setTodoList(List<Todo> todoList) {
-        this.todoList = todoList;
-        notifyDataSetChanged();
-    }
 }
 
 class TodoViewHolder extends RecyclerView.ViewHolder{
     public final TextView todoItemView;
-    private final TodoListAdapter adapter;
+    private TodoViewModel todoViewModel;
 
-    public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter, TodoRepository repository) {
+    public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter, TodoViewModel todoViewModel) {
         super(itemView);
         todoItemView = itemView.findViewById(R.id.todo);
-        this.adapter = adapter;
         for(int index = 0; index < ((ViewGroup) itemView).getChildCount(); index++) {
             View nextChild = ((ViewGroup) itemView).getChildAt(index);
             if (nextChild instanceof ImageButton) {
@@ -76,8 +71,7 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
                         // Get the position of the item that was clicked.
                         int position = getLayoutPosition();
                         Todo todo = adapter.getTodoList().get(position);
-                        repository.delete(todo.getNumber());
-                        adapter.getTodoList().remove(position);
+                        todoViewModel.delete(todo.getNumber());
                         // Notify the adapter, that the data has changed so it can
                         // update the RecyclerView to display the data.
                         adapter.notifyDataSetChanged();

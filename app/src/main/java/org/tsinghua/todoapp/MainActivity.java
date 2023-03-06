@@ -1,6 +1,8 @@
 package org.tsinghua.todoapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,47 +21,36 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<Todo> todoList;
-
     private RecyclerView recyclerView;
     private TodoListAdapter adapter;
     private Button addButton;
     private TextInputLayout textInputLayout;
-    private TodoRepository repository;
+    private TodoViewModel todoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         addButton = findViewById(R.id.add_button);
         textInputLayout = findViewById(R.id.textInputLayout);
-
-        // TODO: 2023/2/10 .get() will block the UI thread
-        try {
-            repository = new asyncCreateRepository().execute(this.getApplication()).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        List<Todo> allTodos = repository.getAllTodos();
-
-        // Create recycler view.
         recyclerView = findViewById(R.id.recyclerview);
+        todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
         // Create an adapter and supply the data to be displayed.
-        adapter = new TodoListAdapter(this, todoList, repository);
+        adapter = new TodoListAdapter(this, todoViewModel);
         // Connect the adapter with the recycler view.
         recyclerView.setAdapter(adapter);
         // Give the recycler view a default layout manager.
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter.setTodoList(allTodos);
+        todoViewModel.getAllTodos().observe(this, todos -> {
+            adapter.notifyDataSetChanged();
+        });
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String content = textInputLayout.getEditText().getText().toString();
-                List<Todo> todoList = adapter.getTodoList();
+                LiveData<List<Todo>> liveTodoList = todoViewModel.getAllTodos();
+                List<Todo> todoList = liveTodoList.getValue();
                 int number;
                 if (todoList.isEmpty()) {
                     number = 1;
@@ -67,19 +58,9 @@ public class MainActivity extends AppCompatActivity {
                     number = todoList.get(todoList.size() - 1).getNumber() + 1;
                 }
                 Todo todo = new Todo(number, content);
-                todoList.add(todo);
-                repository.insert(todo);
+                todoViewModel.insert(todo);
                 textInputLayout.getEditText().setText("");
-                adapter.notifyDataSetChanged();
             }
         });
     }
-
-    class asyncCreateRepository extends AsyncTask<Application, Void, TodoRepository> {
-        @Override
-        protected TodoRepository doInBackground(Application... applications) {
-            return new TodoRepository(applications[0]);
-        }
-    }
-
 }

@@ -1,5 +1,6 @@
 package org.tsinghua.todoapp;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -17,5 +18,5 @@ public interface TodoDao {
     void delete(Todo todo);
 
     @Query("SELECT * from todo_table ORDER BY number ASC")
-    List<Todo> getAllTodos();
+    LiveData<List<Todo>> getAllTodos();
 }

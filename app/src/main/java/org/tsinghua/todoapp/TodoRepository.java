@@ -3,11 +3,13 @@ package org.tsinghua.todoapp;
 import android.app.Application;
 import android.os.AsyncTask;
 
+import androidx.lifecycle.LiveData;
+
 import java.util.List;
 
 public class TodoRepository {
     private TodoDao todoDao;
-    private List<Todo> allTodos;
+    private LiveData<List<Todo>> allTodos;
 
     public TodoRepository(Application application) {
         TodoRoomDatabase db = TodoRoomDatabase.getDatabase(application);
@@ -15,7 +17,7 @@ public class TodoRepository {
         allTodos = todoDao.getAllTodos();
     }
 
-    public List<Todo> getAllTodos() {
+    public LiveData<List<Todo>> getAllTodos() {
         return allTodos;
     }
 
