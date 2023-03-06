@@ -39,14 +39,17 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull TodoViewHolder holder, int position) {
         // Retrieve the data for that position.
-        String current = todoViewModel.getAllTodos().getValue().get(position).getContent();
+        String current = getTodoList().get(position).getContent();
         // Add the data to the view holder.
         holder.todoItemView.setText(current);
     }
 
     @Override
     public int getItemCount() {
-        return todoViewModel.getAllTodos().getValue().size();
+        if (getTodoList() == null) {
+            return 0;
+        }
+        return getTodoList().size();
     }
 
     public List<Todo> getTodoList() {
@@ -62,24 +65,12 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
     public TodoViewHolder(@NonNull View itemView, TodoListAdapter adapter, TodoViewModel todoViewModel) {
         super(itemView);
         todoItemView = itemView.findViewById(R.id.todo);
-        for(int index = 0; index < ((ViewGroup) itemView).getChildCount(); index++) {
-            View nextChild = ((ViewGroup) itemView).getChildAt(index);
-            if (nextChild instanceof ImageButton) {
-                nextChild.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Get the position of the item that was clicked.
-                        int position = getLayoutPosition();
-                        Todo todo = adapter.getTodoList().get(position);
-                        todoViewModel.delete(todo.getNumber());
-                        // Notify the adapter, that the data has changed so it can
-                        // update the RecyclerView to display the data.
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }
+        ImageButton imageButton = itemView.findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(view -> {
+            // Get the position of the item that was clicked.
+            int position = getLayoutPosition();
+            Todo todo = adapter.getTodoList().get(position);
+            todoViewModel.delete(todo.getNumber());
+        });
     }
-
-
 }
