@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     private TodoListAdapter adapter;
     private Button addButton;
     private TextInputLayout textInputLayout;
+
+    public static final int EDIT_DETAIL = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,25 @@ public class MainActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Test for the right intent reply.
+        if (requestCode == EDIT_DETAIL) {
+            // Test to make sure the intent reply result was good.
+            if (resultCode == RESULT_OK) {
+                String content = data.getStringExtra("content");
+                String detail = data.getStringExtra("detail");
+                int position = data.getIntExtra("position", 0);
+                Todo todo = adapter.getTodoList().get(position);
+                todo.setContent(content);
+                todo.setDetail(detail);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 }
 

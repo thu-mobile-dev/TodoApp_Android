@@ -1,7 +1,10 @@
 package org.tsinghua.todoapp;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -64,6 +67,16 @@ class TodoViewHolder extends RecyclerView.ViewHolder{
             // Notify the adapter, that the data has changed so it can
             // update the RecyclerView to display the data.
             adapter.notifyDataSetChanged();
+        });
+        todoItemView.setOnClickListener(view -> {
+            int position = getLayoutPosition();
+            Context context = view.getContext();
+            Intent intent = new Intent(context, DetailActivity.class);
+            Todo todo = adapter.getTodoList().get(position);
+            intent.putExtra("content", todo.getContent());
+            intent.putExtra("detail", todo.getDetail());
+            intent.putExtra("position", position);
+            ((Activity) context).startActivityForResult(intent, MainActivity.EDIT_DETAIL);
         });
     }
 }
