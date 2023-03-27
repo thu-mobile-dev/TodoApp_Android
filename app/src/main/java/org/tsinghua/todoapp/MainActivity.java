@@ -1,54 +1,42 @@
 package org.tsinghua.todoapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
-    private final TodoList todoList = new TodoList();
-    private RecyclerView recyclerView;
-    private TodoListAdapter adapter;
-    private Button addButton;
-    private TextInputLayout textInputLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.tsinghua.todoapp.databinding.ActivityMainBinding;
+
+public class MainActivity extends AppCompatActivity implements HomeFragment.HomeFragmentListener {
+    private ActivityMainBinding binding;
+    private BottomNavigationView navView;
 
     public static final int EDIT_DETAIL = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        addButton = findViewById(R.id.add_button);
-        textInputLayout = findViewById(R.id.textInputLayout);
-
-        // Put initial data into the word list.
-        for (int i = 0; i < 20; i++) {
-            todoList.insert("Todo " + i);
-        }
-        // Create recycler view.
-        recyclerView = findViewById(R.id.recyclerview);
-        // Create an adapter and supply the data to be displayed.
-        adapter = new TodoListAdapter(this, todoList);
-        // Connect the adapter with the recycler view.
-        recyclerView.setAdapter(adapter);
-        // Give the recycler view a default layout manager.
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String content = textInputLayout.getEditText().getText().toString();
-                adapter.getTodoList().insert(content);
-                textInputLayout.getEditText().setText("");
-                adapter.notifyDataSetChanged();
-            }
-        });
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        this.navView = navView;
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
     @Override
@@ -62,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
                 String content = data.getStringExtra("content");
                 String detail = data.getStringExtra("detail");
                 int position = data.getIntExtra("position", 0);
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+                RecyclerView view = (RecyclerView) fragment.getView().findViewById(R.id.recyclerview);
+                TodoListAdapter adapter = (TodoListAdapter) view.getAdapter();
                 Todo todo = adapter.getTodoList().get(position);
                 todo.setContent(content);
                 todo.setDetail(detail);
@@ -69,5 +60,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-}
 
+    @Override
+    public void hideBottomNavView() {
+        navView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showBottomNavView() {
+        navView.setVisibility(View.VISIBLE);
+    }
+}
